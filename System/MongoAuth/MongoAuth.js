@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 import { useMultiFileAuthState, BufferJSON } from "@whiskeysockets/baileys";
 import { sessionSchema } from "./Schema/index.js";
 
@@ -101,6 +102,7 @@ export default class MongoAuth {
    * Called by the periodic background sync (GC interval).
    */
   async pushToMongoDB() {
+    if (mongoose.connection.readyState !== 1) return;
     const localExists = await this._localExists();
     if (!localExists) return;
 
@@ -145,6 +147,7 @@ export default class MongoAuth {
   }
 
   async _mongoExists() {
+    if (mongoose.connection.readyState !== 1) return false;
     try {
       const doc = await sessionSchema.findOne({ sessionId: this.sessionId });
       if (!doc) return false;
@@ -236,10 +239,12 @@ export default class MongoAuth {
   async _clearSession() {
     await fs.promises.rm(this.dir, { recursive: true, force: true });
 
-    try {
-      await sessionSchema.deleteOne({ sessionId: this.sessionId });
-    } catch {
-      // local is already cleared
+    if (mongoose.connection.readyState === 1) {
+      try {
+        await sessionSchema.deleteOne({ sessionId: this.sessionId });
+      } catch {
+        // local is already cleared
+      }
     }
 
     console.log(`[ ATLAS ] Session cleared from local storage and MongoDB.`);

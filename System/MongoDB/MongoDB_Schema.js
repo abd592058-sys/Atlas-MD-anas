@@ -2,12 +2,21 @@ import mongoose from "mongoose";
 import config from "../../Configurations.js";
 const options = {
   socketTimeoutMS: 30000,
+  serverSelectionTimeoutMS: 3000,
+  connectTimeoutMS: 3000,
+  bufferCommands: false,
 };
 
 // ----------------------- Atlas can work with upto 4 MongoDB databases at once to distribute DB load  -------------------- //
 
 const db1 = mongoose.createConnection(config.mongodb, options); // You malually put first mongodb url here
 const db2 = mongoose.createConnection(config.mongodb, options); // You malually put second mongodb url here
+db1.on("error", (err) =>
+  console.warn(`[ ATLAS ] MongoDB (db1) unavailable: ${err.message}`),
+);
+db2.on("error", (err) =>
+  console.warn(`[ ATLAS ] MongoDB (db2) unavailable: ${err.message}`),
+);
 
 const GroupSchema = new mongoose.Schema({
   id: { type: String, unique: true, required: true },

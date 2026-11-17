@@ -95,12 +95,13 @@ process.stderr.write = (chunk, ...rest) => {
 
 import express from "express";
 const app = express();
-const PORT = global.port;
+const PORT = Number(global.port) || 3000;
 import welcomeLeft from "./System/Welcome.js";
 import { readcommands, commands } from "./System/ReadCommands.js";
 import core from "./Core.js";
 commands.prefix = global.prefa;
 import mongoose from "mongoose";
+mongoose.set("bufferCommands", false);
 import qrcode from "qrcode";
 import qrcodeTerminal from "qrcode-terminal";
 import {
@@ -443,7 +444,10 @@ const connectAtlas = async (trigger) => {
   // ────────────────────────────────────────────────────────────────────────
 
   try {
-    await mongoose.connect(mongodb);
+    await mongoose.connect(mongodb, {
+      serverSelectionTimeoutMS: 3000,
+      connectTimeoutMS: 3000,
+    });
     console.log(chalk.green(`[ ATLAS ] MongoDB connected ✓`));
   } catch (err) {
     console.error(
@@ -1333,4 +1337,6 @@ app.post("/api/pair", async (req, res) => {
   }
 });
 
-app.listen(PORT);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[ ATLAS ] Web server listening on http://0.0.0.0:${PORT}`);
+});

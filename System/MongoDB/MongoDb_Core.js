@@ -93,6 +93,10 @@ cacheSweepTimer.unref?.();
 
 // BAN USER
 async function banUser(userId) {
+  if (userData.db.readyState !== 1) {
+    _setUser(userId, { ban: true });
+    return;
+  }
   const user = await userData.findOne({ id: userId });
   if (!user) {
     await userData.create({ id: userId, ban: true });
@@ -111,6 +115,7 @@ async function banUser(userId) {
 async function checkBan(userId) {
   const cached = _getUser(userId);
   if (cached) return cached.ban ?? false;
+  if (userData.db.readyState !== 1) return false;
 
   const user = await userData.findOne({ id: userId });
   if (!user) {
@@ -123,6 +128,10 @@ async function checkBan(userId) {
 
 // UNBAN USER
 async function unbanUser(userId) {
+  if (userData.db.readyState !== 1) {
+    _setUser(userId, { ban: false });
+    return;
+  }
   const user = await userData.findOne({ id: userId });
   if (!user) {
     await userData.create({ id: userId, ban: false });
@@ -142,6 +151,10 @@ async function unbanUser(userId) {
 // ADD MOD
 async function addMod(userId) {
   if (global.owner?.includes(userId)) return;
+  if (userData.db.readyState !== 1) {
+    _setUser(userId, { addedMods: true });
+    return;
+  }
   const user = await userData.findOne({ id: userId });
   if (!user) {
     await userData.create({ id: userId, addedMods: true });
@@ -165,6 +178,7 @@ async function checkMod(userId) {
 
   const cached = _getUser(userId);
   if (cached) return cached.addedMods ?? false;
+  if (userData.db.readyState !== 1) return false;
 
   const user = await userData.findOne({ id: userId });
   if (!user) {
@@ -178,6 +192,10 @@ async function checkMod(userId) {
 // DEL MOD
 async function delMod(userId) {
   if (global.owner?.includes(userId)) return;
+  if (userData.db.readyState !== 1) {
+    _setUser(userId, { addedMods: false });
+    return;
+  }
   const user = await userData.findOne({ id: userId });
   if (!user) {
     await userData.create({ id: userId, addedMods: false });
@@ -199,6 +217,10 @@ async function delMod(userId) {
 
 // SET CHAR ID
 async function setChar(charId) {
+  if (systemData.db.readyState !== 1) {
+    _setSys({ seletedCharacter: charId });
+    return;
+  }
   const character = await systemData.findOne({ id: "1" });
   if (!character) {
     await systemData.create({ id: "1", seletedCharacter: charId });
@@ -215,6 +237,7 @@ async function setChar(charId) {
 async function getChar() {
   const cached = _getSys();
   if (cached?.seletedCharacter !== undefined) return cached.seletedCharacter;
+  if (systemData.db.readyState !== 1) return "0";
 
   const character = await systemData.findOne({ id: "1" });
   if (!character) {
@@ -233,6 +256,10 @@ async function getChar() {
 
 // ACTIVATE PM CHATBOT
 async function activateChatBot() {
+  if (systemData.db.readyState !== 1) {
+    _setSys({ PMchatBot: true });
+    return;
+  }
   const chatbotpm = await systemData.findOne({ id: "1" });
   if (!chatbotpm) {
     await systemData.create({ id: "1", PMchatBot: true });
@@ -249,6 +276,7 @@ async function activateChatBot() {
 async function checkPmChatbot() {
   const cached = _getSys();
   if (cached?.PMchatBot !== undefined) return cached.PMchatBot;
+  if (systemData.db.readyState !== 1) return false;
 
   const chatbotpm = await systemData.findOne({ id: "1" });
   if (!chatbotpm) {
@@ -265,6 +293,10 @@ async function checkPmChatbot() {
 
 // DEACTIVATE PM CHATBOT
 async function deactivateChatBot() {
+  if (systemData.db.readyState !== 1) {
+    _setSys({ PMchatBot: false });
+    return;
+  }
   const chatbotpm = await systemData.findOne({ id: "1" });
   if (!chatbotpm) {
     await systemData.create({ id: "1", PMchatBot: false });
@@ -281,6 +313,10 @@ async function deactivateChatBot() {
 
 // SET BOT MODE
 async function setBotMode(mode) {
+  if (systemData.db.readyState !== 1) {
+    _setSys({ botMode: mode });
+    return;
+  }
   const selectedMode = await systemData.findOne({ id: "1" });
   if (!selectedMode) {
     await systemData.create({ id: "1", botMode: mode });
@@ -294,6 +330,7 @@ async function setBotMode(mode) {
 async function getBotMode() {
   const cached = _getSys();
   if (cached?.botMode !== undefined) return cached.botMode;
+  if (systemData.db.readyState !== 1) return "public";
 
   const selectedMode = await systemData.findOne({ id: "1" });
   if (!selectedMode) {
@@ -312,6 +349,10 @@ async function getBotMode() {
 
 // SET WELCOME MESSAGE
 async function setWelcome(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { switchWelcome: true });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, switchWelcome: true });
@@ -328,6 +369,7 @@ async function setWelcome(groupID) {
 async function checkWelcome(groupID) {
   const cached = _getGroup(groupID);
   if (cached?.switchWelcome !== undefined) return cached.switchWelcome;
+  if (groupData.db.readyState !== 1) return false;
 
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
@@ -345,6 +387,10 @@ async function checkWelcome(groupID) {
 
 // DELETE WELCOME MESSAGE
 async function delWelcome(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { switchWelcome: false });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, switchWelcome: false });
@@ -359,6 +405,10 @@ async function delWelcome(groupID) {
 
 // SET ANTI-LINK
 async function setAntilink(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { antilink: true });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, antilink: true });
@@ -375,6 +425,7 @@ async function setAntilink(groupID) {
 async function checkAntilink(groupID) {
   const cached = _getGroup(groupID);
   if (cached?.antilink !== undefined) return cached.antilink;
+  if (groupData.db.readyState !== 1) return false;
 
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
@@ -392,6 +443,10 @@ async function checkAntilink(groupID) {
 
 // DELETE ANTI-LINK
 async function delAntilink(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { antilink: false });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, antilink: false });
@@ -406,6 +461,10 @@ async function delAntilink(groupID) {
 
 // SET ANTI-DELETE
 async function setAntidelete(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { antidelete: true });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, antidelete: true });
@@ -422,6 +481,7 @@ async function setAntidelete(groupID) {
 async function checkAntidelete(groupID) {
   const cached = _getGroup(groupID);
   if (cached?.antidelete !== undefined) return cached.antidelete;
+  if (groupData.db.readyState !== 1) return false;
 
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
@@ -440,6 +500,10 @@ async function checkAntidelete(groupID) {
 
 // DELETE ANTI-DELETE
 async function delAntidelete(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { antidelete: false });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, antidelete: false });
@@ -454,6 +518,10 @@ async function delAntidelete(groupID) {
 
 // SET GROUP CHATBOT
 async function setGroupChatbot(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { chatBot: true });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, chatBot: true });
@@ -470,6 +538,7 @@ async function setGroupChatbot(groupID) {
 async function checkGroupChatbot(groupID) {
   const cached = _getGroup(groupID);
   if (cached?.chatBot !== undefined) return cached.chatBot;
+  if (groupData.db.readyState !== 1) return false;
 
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
@@ -487,6 +556,10 @@ async function checkGroupChatbot(groupID) {
 
 // DELETE GROUP CHATBOT
 async function delGroupChatbot(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { chatBot: false });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, chatBot: false });
@@ -501,6 +574,10 @@ async function delGroupChatbot(groupID) {
 
 // BAN GROUP
 async function banGroup(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { bangroup: true });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, bangroup: true });
@@ -517,6 +594,7 @@ async function banGroup(groupID) {
 async function checkBanGroup(groupID) {
   const cached = _getGroup(groupID);
   if (cached?.bangroup !== undefined) return cached.bangroup;
+  if (groupData.db.readyState !== 1) return false;
 
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
@@ -534,6 +612,10 @@ async function checkBanGroup(groupID) {
 
 // UNBAN GROUP
 async function unbanGroup(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { bangroup: false });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
   if (!group) {
     await groupData.create({ id: groupID, bangroup: false });
@@ -548,6 +630,10 @@ async function unbanGroup(groupID) {
 
 // SET NSFW
 async function setNSFW(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { nsfw: true });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
 
   if (!group) {
@@ -563,6 +649,7 @@ async function setNSFW(groupID) {
 async function checkNSFW(groupID) {
   const cached = _getGroup(groupID);
   if (cached?.nsfw !== undefined) return cached.nsfw;
+  if (groupData.db.readyState !== 1) return false;
 
   const group = await groupData.findOne({ id: groupID });
 
@@ -577,6 +664,10 @@ async function checkNSFW(groupID) {
 
 // DISABLE NSFW
 async function delNSFW(groupID) {
+  if (groupData.db.readyState !== 1) {
+    _setGroup(groupID, { nsfw: false });
+    return;
+  }
   const group = await groupData.findOne({ id: groupID });
 
   if (!group) {
@@ -595,18 +686,25 @@ async function delNSFW(groupID) {
 
 // PUSH NEW INSTALLED PLUGIN IN DATABASE
 async function pushPlugin(newPlugin, url) {
+  if (pluginData.db.readyState !== 1) {
+    throw new Error("Database is not connected.");
+  }
   const plugin = new pluginData({ plugin: newPlugin, url: url });
   await plugin.save();
 }
 
 // Check if plugin is installed
 async function isPluginPresent(pluginName) {
+  if (pluginData.db.readyState !== 1) return false;
   const plugin = await pluginData.findOne({ plugin: pluginName });
   return !!plugin;
 }
 
 // DELETE A PLUGIN FROM THE DATABASE
 async function delPlugin(pluginName) {
+  if (pluginData.db.readyState !== 1) {
+    throw new Error("Database is not connected.");
+  }
   const plugin = await pluginData.findOne({ plugin: pluginName });
   if (!plugin) {
     throw new Error("The plugin is not present in the database.");
@@ -616,12 +714,14 @@ async function delPlugin(pluginName) {
 
 // Get all installed plugin URLs as an array
 async function getPluginURLs() {
+  if (pluginData.db.readyState !== 1) return [];
   const plugins = await pluginData.find({}, "url");
   return plugins.map((plugin) => plugin.url);
 }
 
 // Getting all plugins as an array
 async function getAllPlugins() {
+  if (pluginData.db.readyState !== 1) return [];
   return pluginData.find({}, { plugin: 1, url: 1 });
 }
 

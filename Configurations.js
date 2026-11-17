@@ -35,7 +35,7 @@ global.sessionId = stripEnv(process.env.SESSION_ID, "ok");
 global.prefa = stripEnv(process.env.PREFIX, "-");
 global.packname = stripEnv(process.env.PACKNAME, `Atlas Bot`);
 global.author = stripEnv(process.env.AUTHOR, "by: Team Atlas");
-global.port = stripEnv(process.env.PORT, "10000");
+global.port = stripEnv(process.env.DEFAULT_APP_PORT, "3000");
 
 // Multi-key pools — comma-separate as many keys as you want in .env
 global.geminiAPIKeys = parseKeys(
